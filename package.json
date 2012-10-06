@@ -1,0 +1,12 @@
+{
+  "name": "preview",
+  "version": "0.0.1",
+  "bin": "./bin/preview",
+  "main": "./app.coffee",
+  "dependencies": {
+    "express": "*",
+    "underscore": "*",
+    "watch": "*",
+    "socket.io": "*"
+  }
+}
