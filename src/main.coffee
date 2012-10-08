@@ -55,18 +55,6 @@ uniforms =
   time:
     type: 'f'
     value: 1.0
-  resolution:
-    type: 'v2',
-    value: new THREE.Vector2(width, height)
-  texture1:
-    type: 't'
-    value: THREE.ImageUtils.loadTexture('textures/cloud.png')
-  texture2:
-    type: 't'
-    value: THREE.ImageUtils.loadTexture('textures/lavatile.jpeg')
-
-uniforms.texture1.value.wrapS = uniforms.texture1.value.wrapT = THREE.RepeatWrapping
-uniforms.texture2.value.wrapS = uniforms.texture2.value.wrapT = THREE.RepeatWrapping
 
 material = new THREE.ShaderMaterial
   vertexShader: vertexShader
