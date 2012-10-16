@@ -1,12 +1,15 @@
 {
-  "name": "preview",
+  "name": "shadow",
   "version": "0.0.1",
-  "bin": "./bin/preview",
+  "bin": "./bin/shadow",
   "main": "./app.coffee",
   "dependencies": {
-    "express": "*",
+    "coffee-script": "*",
+    "connect": "*",
+    "prompt": "*",
+    "sass": "*",
+    "socket.io": "*",
     "underscore": "*",
-    "watch": "*",
-    "socket.io": "*"
+    "watch": "*"
   }
 }
