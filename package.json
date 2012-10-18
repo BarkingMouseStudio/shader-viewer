@@ -7,7 +7,7 @@
     "coffee-script": "*",
     "connect": "*",
     "prompt": "*",
-    "sass": "*",
+    "less": "*",
     "socket.io": "*",
     "underscore": "*",
     "watch": "*"

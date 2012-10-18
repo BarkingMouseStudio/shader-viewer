@@ -2,41 +2,28 @@
 <html>
   <head>
     <title>Preview</title>
-    <link href='styles.css' rel='stylesheet'>
+    <link href='styles/styles.css' rel='stylesheet'>
   </head>
   <body>
     <div id='content'></div>
-    <div id='menu'></div>
-
-    <script type='x-shader/x-vertex' id='initial-vertex-shader'>
-      #ifdef GL_ES
-        precision highp float;
-      #endif
-
-      void main() {
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    </script>
-
-    <script type='x-shader/x-fragment' id='initial-fragment-shader'>
-      #ifdef GL_ES
-        precision highp float;
-      #endif
-
-      void main() {
-        gl_FragColor = vec4(1.0, 0.0, 1.0, 1);
-      }
-    </script>
-
-    <script src='three.js/build/three.min.js'></script>
-    <script src='three.js/examples/js/postprocessing/MaskPass.js'></script>
-    <script src='three.js/examples/js/postprocessing/RenderPass.js'></script>
-    <script src='three.js/examples/js/postprocessing/ShaderPass.js'></script>
-    <script src='three.js/examples/js/postprocessing/EffectComposer.js'></script>
-    <script src='three.js/examples/js/ShaderExtras.js'></script>
-
-    <script src="/socket.io/socket.io.js"></script>
-
-    <script src='main.js'></script>
+    <div id='menu'>
+      <h3>Fragment Shaders</h3>
+      <div id="fragment-selection"></div>
+      <h3>Vertex Shaders</h3>
+      <div id="vertex-selection"></div>
+      <h3>Models</h3>
+      <div id="model-selection"></div>
+      <h3>Images</h3>
+      <div id="image-selection"></div>      
+    </div>
+    <script src='scripts/deps/threejs/build/three.min.js'></script>
+    <script src='scripts/deps/threejs/examples/js/postprocessing/MaskPass.js'></script>
+    <script src='scripts/deps/threejs/examples/js/postprocessing/RenderPass.js'></script>
+    <script src='scripts/deps/threejs/examples/js/postprocessing/ShaderPass.js'></script>
+    <script src='scripts/deps/threejs/examples/js/postprocessing/EffectComposer.js'></script>
+    <script src='scripts/deps/threejs/examples/js/ShaderExtras.js'></script>
+    <script src='scripts/deps/underscore.js'></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src='scripts/main.js'></script>
   </body>
 </html>
