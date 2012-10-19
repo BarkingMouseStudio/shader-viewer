@@ -13,25 +13,42 @@ uniforms =
     type: 'f'
     value: 1.0
 
-vertexShader = vertexShader or null
-fragmentShader = fragmentShader or null
+activeVertex = activeFragment = null
+defaultVertex = document.getElementById('default-vertex-shader').innerHTML
+defaultFragment = document.getElementById('default-fragment-shader').innerHTML
+
+
 
 ### HELPER FUNCTIONS ###
 purge = (el) ->
   for attribute in el.attributes
-    el[attribute.name] = null if typeof el[attribute.name] is "function"            
+    if typeof el[attribute.name] is "function"
+      el[attribute.name] = null 
   for child in el.childNodes
     purge child  
   return
       
 # ### 3JS FUNCTIONS ###      
+getShaders = ->
+  unless activeFragment
+    fragment = defaultFragment
+  
+  unless activeVertex
+    vertex = defaultVertex
+  
+  return [fragment, vertex]
+  
+  
+  
+[fragment, vertex] = getShaders()
+
 colorToVector3 = (color) ->
   return new THREE.Vector3(color.r, color.g, color.b)
 
 # Renderer
 renderer = new THREE.WebGLRenderer(antialias: true)
 # renderer.setClearColorHex(0xffffff, 1)
-renderer.setSize(width = window.innerWidth, height = window.innerHeight)
+renderer.setSize(width = (window.innerWidth * .8), height = window.innerHeight)
 renderer.autoClear = false
 
 # DOM
@@ -74,12 +91,12 @@ plane.rotation.z = Math.PI / 4
 scene.add(plane)
 
 # Sphere
-# sphereMaterial = new THREE.ShaderMaterial
-#   vertexShader: vertexShader
-#   fragmentShader: fragmentShader
-#   uniforms: uniforms
-# sphere = new THREE.Mesh(new THREE.SphereGeometry(50, 32, 32), sphereMaterial)
-# scene.add(sphere)
+sphereMaterial = new THREE.ShaderMaterial
+  vertexShader: vertex
+  fragmentShader: fragment
+  uniforms: uniforms
+sphere = new THREE.Mesh(new THREE.SphereGeometry(50, 32, 32), sphereMaterial)
+scene.add(sphere)
 
 # Effects
 renderTarget = new THREE.WebGLRenderTarget width, height, parameters =
@@ -116,9 +133,11 @@ render = ->
 render()
 
 
+
 ### EVENTS ####
 update = (res) ->
   console.log "update #{res.name}"
+  
   # sphereMaterial.vertexShader = res.data
   # sphereMaterial.fragmentShader = res.data
   # sphereMaterial.needsUpdate = true

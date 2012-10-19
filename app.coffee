@@ -64,14 +64,14 @@ io.sockets.on 'connection', (socket) ->
     socket.emit "file:#{event}", {name: name, type: type}
       
   # Loop through existing files and send to the client
-  emitfiles = (folder) ->
+  emitFiles = (folder) ->
     fs.readdir "#{directory}/#{folder}", (err,files) ->
       for file in files
         # send the full path "#{directory}/#{folder}/#{file}"
         emit 'created', "#{directory}/#{folder}/#{file}"
 
   # readdir isn't recursive so we need to loop through the folders
-  emitfiles folder for folder in FOLDERS
+  emitFiles folder for folder in FOLDERS
   
   # Monitor for new files and changes to existing files
   watch.createMonitor directory, (monitor) ->
@@ -84,6 +84,7 @@ io.sockets.on 'connection', (socket) ->
     monitor.on 'removed', (f, stat) ->
       console.log "removed #{f}"
       emit 'removed', f
+
 
 ### CREATE FOLDERS ###
 fs.readdir directory, (err,files) ->
