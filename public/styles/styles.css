@@ -4,31 +4,36 @@ body {
   font-size: 14px;
   line-height: 24px;
   color: #333333;
-  background-color: #ffffff;
+  background: #f8f8f8;
 }
 #content {
   position: absolute;
   top: 0;
   bottom: 0;
-  right:0;
-  left:20%;
-  border-left: 1px solid #ddd;
+  right: 0;
+  left: 20%;
+  border-left: 4px solid #ccc;
 }
-#menu {
-  width:20%;
-  padding: 12px;
+#sidebar {
+  width: 20%;
 }
-#menu a {
+#sidebar h3 {
+  margin: 10px;
+}
+#sidebar menu {
+  margin: 10px 10px 10px 20px;
+  padding: 0;
+}
+#sidebar a {
   color: #0088cc;
   text-decoration: none;
   display: block;
 }
-#menu a:hover {
+#sidebar a:hover {
   color: #005580;
   text-decoration: underline;
 }
-#menu a.active {
-  background: url('../imgs/checkbox.png') right center no-repeat;
-  padding-right: 20px;
-  font-weight: bold;
+#sidebar a.active {
+  background: url('../images/checkbox.png') left center no-repeat;
+  padding-left: 20px;
 }

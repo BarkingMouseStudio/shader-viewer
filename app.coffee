@@ -1,6 +1,6 @@
 ### REQUIRES ###
 connect = require 'connect'
-compiler = require "#{__dirname}/lib/compiler"
+compiler = require './lib/compiler'
 fs = require 'fs'
 http = require 'http'
 io = require 'socket.io'
@@ -11,7 +11,12 @@ _ = require 'underscore'
 
 
 ### CONSTANTS ###
-FOLDERS = [ 'fragments', 'images', 'models', 'vertexs' ]
+ASSET_FOLDERS = [
+  'fragments',
+  'textures',
+  'models',
+  'vertices'
+]
 
 
 ### HELPER FUNCTIONS ###
@@ -22,12 +27,6 @@ parseArgs = (args) ->
   while i < args.length
     options[args[i++]] = args[i++]
   return options
-
-parsePath = (filePath) ->
-  segments = filePath.split('/')
-  file = segments.pop()
-  type = segments.pop()
-  return [file, type]
 
 
 ### OPTIONS ###
@@ -53,57 +52,87 @@ server.listen port, ->
 io = io.listen(server)
 io.set('log level', 1)
 
+singularize = (str) -> str.replace(/s$/, '')
+
+# Read a file and send it's contents to the client
+emitFile = (socket, event, file) ->
+  name = path.basename(file)
+  group = path.basename(path.dirname(file))
+
+  unless group in ASSET_FOLDERS
+    return
+
+  socket.emit "file:#{event}", {
+    id: name.replace(/\W/g, '_'),
+    name: name.replace /\W(\w)/g, ($0, $1) ->
+      $1.toUpperCase()
+    path: "#{group}/#{name}",
+    title: name,
+    group: group,
+    type: singularize(group)
+  }
+
+# Loop through existing files and send to the client
+emitFiles = (socket, folder) ->
+  fs.readdir "#{directory}/#{folder}", (err, files) ->
+    if err
+      console.error(err.message)
+      return
+
+    unless files
+      return
+
+    # Send the full path "#{directory}/#{folder}/#{file}"
+    for file in files
+      if /^\./.test(file)
+        continue
+      emitFile(socket, 'created', "#{directory}/#{folder}/#{file}")
+
 io.sockets.on 'connection', (socket) ->
-
-  # Read a file and send it's contents to the client
-  emit = (event, file) ->
-    [name, type] = parsePath file
-    
-    return unless name.indexOf('.') isnt 0 and type in FOLDERS
-    
-    socket.emit "file:#{event}", {name: name, type: type}
-      
-  # Loop through existing files and send to the client
-  emitFiles = (folder) ->
-    fs.readdir "#{directory}/#{folder}", (err,files) ->
-      for file in files
-        # send the full path "#{directory}/#{folder}/#{file}"
-        emit 'created', "#{directory}/#{folder}/#{file}"
-
-  # readdir isn't recursive so we need to loop through the folders
-  emitFiles folder for folder in FOLDERS
+  # Loop through the folders because readdir isn't recursive
+  emitFiles(socket, folder) for folder in ASSET_FOLDERS
   
   # Monitor for new files and changes to existing files
-  watch.createMonitor directory, (monitor) ->
+  watch.createMonitor directory, {
+    persistent: true,
+    interval: 500
+  }, (monitor) ->
     monitor.on 'created', (f, stat) ->
       console.log "created #{f}"
-      emit 'created', f
+      emitFile(socket, 'created', f)
     monitor.on 'changed', (f, curr, prev) ->
       console.log "changed #{f}"
-      emit 'changed', f
+      emitFile(socket, 'changed', f)
     monitor.on 'removed', (f, stat) ->
       console.log "removed #{f}"
-      emit 'removed', f
+      emitFile(socket, 'removed', f)
 
 
-### CREATE FOLDERS ###
-fs.readdir directory, (err,files) ->
-  # Return if we don't have any missing any folders
-  return if _.intersection(FOLDERS, files).length is FOLDERS.length
+### CREATE ASSET_FOLDERS ###
+fs.readdir directory, (err, files) ->
+  if err
+    console.error(err.message)
+    return
+
+  # Return if we are not missing any folders
+  if _.intersection(ASSET_FOLDERS, files).length is ASSET_FOLDERS.length
+    return
 
   # Ask if we want to add missing folders
   prompt.message = 'Question'
   prompt.start()
 
   question =
-    name: 'folders'
-    message: 'Auto-create required sub-folders? yes/no'
-    validator: /y[es]*|n[o]?/
-    warning: 'Really? It\'s just a yes or no question...'
-    default: 'yes'
+    name: 'create_folders'
+    message: 'Auto-create required sub-folders? Y/n'
+    validator: /y(es)?|n(o)?/
+    warning: "Really? It's just a yes or no question..."
+    default: 'no'
 
   # Make any directories that don't exist
   prompt.get question, (err, result) ->
-    if result.folders is 'yes'
-      for type in FOLDERS
-        fs.mkdir "#{directory}/#{type}" unless _.contains(files, type)
+    unless result.create_folders is 'yes'
+      return
+
+    for type in ASSET_FOLDERS
+      fs.mkdir "#{directory}/#{type}" unless _.contains(files, type)
